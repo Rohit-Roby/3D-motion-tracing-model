@@ -5,6 +5,10 @@ import json
 HOST = '127.0.0.1'
 PORT = 65432
 
+# Define Blender connection settings
+BLENDER_HOST = 'localhost'
+BLENDER_PORT = 65433
+
 def start_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
@@ -44,9 +48,18 @@ def start_server():
                     print(f"An error occurred: {e}")
 
 def send_to_blender(landmarks):
-    # For demonstration, we just print landmarks
-    # Replace this with actual code to send data to Blender
-    print("Sending data to Blender:", landmarks)
+    # Create a socket connection to Blender
+    blender_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    blender_socket.connect((BLENDER_HOST, BLENDER_PORT))
+
+    # Send landmarks to Blender
+    data = json.dumps(landmarks)
+    data_length = str(len(data)) + '\n'
+    blender_socket.sendall(data_length.encode('utf-8'))
+    blender_socket.sendall(data.encode('utf-8'))
+
+    # Close the socket connection
+    blender_socket.close()
 
 if __name__ == "__main__":
     start_server()
